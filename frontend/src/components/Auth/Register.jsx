@@ -1,5 +1,13 @@
-import React from "react"
-
+import React, { useContext, useState } from "react";
+import { FaRegUser } from "react-icons/fa";
+import { MdOutlineMailOutline } from "react-icons/md";
+import { RiLock2Fill } from "react-icons/ri";
+import { FaPencilAlt } from "react-icons/fa";
+import { FaPhoneFlip } from "react-icons/fa6";
+import { Link, Navigate } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { Context } from "../../main";
 
 const Register=() =>{
     const [email, setEmail] = useState("");
@@ -63,7 +71,7 @@ const Register=() =>{
               <div>
                 <input
                   type="text"
-                  placeholder="Zeeshan"
+                  placeholder="Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -75,7 +83,7 @@ const Register=() =>{
               <div>
                 <input
                   type="email"
-                  placeholder="zk@gmail.com"
+                  placeholder="abc@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />

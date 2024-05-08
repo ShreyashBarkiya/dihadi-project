@@ -5,7 +5,7 @@ import {
     MdAccountBalance,
     MdOutlineAnimation,
   } from "react-icons/md";
-  import { TbAppsFilled } from "react-icons/tb";
+  // import { TbAppsFilled } from "react-icons/tb";
   import { FaReact } from "react-icons/fa";
   import { GiArtificialIntelligence } from "react-icons/gi";
   import { IoGameController } from "react-icons/io5";
@@ -22,7 +22,7 @@ const PopularCategories=() =>{
           id: 2,
           title: "Mobile App Development",
           subTitle: "500 Open Positions",
-          icon: <TbAppsFilled />,
+          // icon: <TbAppsFilled />,
         },
         {
           id: 3,
