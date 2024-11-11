@@ -10,7 +10,7 @@ const Footer=() =>{
         <footer className={isAuthorized ? "footerShow" : "footerHide"}>
         <div>&copy; All Rights Reserved.</div>
         <div>
-          <p>Developed by Abhishek Nema,Sambhav Kanugo,Shreyash Barkiya</p>
+          <p>Developed by Abhishek Nema,Sambhav Kanugo,Shreyash Barkiya,Priyanshu Bairagi</p>
         </div>
       </footer>
     )

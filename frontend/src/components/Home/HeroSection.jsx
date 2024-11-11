@@ -37,13 +37,12 @@ const HeroSection=() =>{
             <h1>Find a job that suits</h1>
             <h1>your interests and skills</h1>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorem
-              voluptate repellat modi quidem aliquid eaque ducimus ipsa et,
-              facere mollitia!
+              Dihadi helps you to find suitable job for you and provides you a platform through which you can also post your jobs.
+               
             </p>
           </div>
           <div className="image">
-            <img src="/heroS.jpg" alt="hero" />
+            <img src="/JOB.jpeg" alt="hero" />
           </div>
         </div>
         <div className="details">

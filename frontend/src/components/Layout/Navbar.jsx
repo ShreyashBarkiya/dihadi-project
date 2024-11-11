@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import {Context} from '../../main';
-import { Link,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { GiHamburgerMenu } from "react-icons/gi";
@@ -27,7 +27,7 @@ const Navbar=() =>{
           <nav className={isAuthorized ? "navbarShow":"navbarHide"}>
             <div className="container">
                 <div className="logo">
-                    <img src="" alt="" />
+                    <img src="/logo1.jpeg" alt="" />
                 </div>
                 <ul className={!show ? "menu" : "show-menu menu"}>
           <li>

@@ -1,118 +1,192 @@
-import axios from "axios";
-import React, { useContext, useState } from "react";
-import toast from "react-hot-toast";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../../main";
-const Application = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [coverLetter, setCoverLetter] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [resume, setResume] = useState(null);
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import ResumeModal from "./ResumeModal";
 
-  const { isAuthorized, user } = useContext(Context);
+const MyApplications = () => {
+  const { user } = useContext(Context);
+  const [applications, setApplications] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [resumeImageUrl, setResumeImageUrl] = useState("");
 
+  const { isAuthorized } = useContext(Context);
   const navigateTo = useNavigate();
 
-  // Function to handle file input changes
-  const handleFileChange = (event) => {
-    const resume = event.target.files[0];
-    setResume(resume);
-  };
-
-  const { id } = useParams();
-  const handleApplication = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("phone", phone);
-    formData.append("address", address);
-    formData.append("coverLetter", coverLetter);
-    formData.append("resume", resume);
-    formData.append("jobId", id);
-
+  useEffect(() => {
     try {
-      const { data } = await axios.post(
-        "http://localhost:4000/api/v1/application/post",
-        formData,
-        {
+      if (user && user.role === "Employer") {
+        axios
+          .get("http://localhost:4000/api/v1/application/employer/getall", {
+            withCredentials: true,
+          })
+          .then((res) => {
+            setApplications(res.data.applications);
+          });
+      } else {
+        axios
+          .get("http://localhost:4000/api/v1/application/jobseeker/getall", {
+            withCredentials: true,
+          })
+          .then((res) => {
+            setApplications(res.data.applications);
+          });
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  }, [isAuthorized]);
+
+  if (!isAuthorized) {
+    navigateTo("/");
+  }
+
+  const deleteApplication = (id) => {
+    try {
+      axios
+        .delete(`http://localhost:4000/api/v1/application/delete/${id}`, {
           withCredentials: true,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      setName("");
-      setEmail("");
-      setCoverLetter("");
-      setPhone("");
-      setAddress("");
-      setResume("");
-      toast.success(data.message);
-      navigateTo("/job/getall");
+        })
+        .then((res) => {
+          toast.success(res.data.message);
+          setApplications((prevApplication) =>
+            prevApplication.filter((application) => application._id !== id)
+          );
+        });
     } catch (error) {
       toast.error(error.response.data.message);
     }
   };
 
-  if (!isAuthorized || (user && user.role === "Employer")) {
-    navigateTo("/");
-  }
+  const openModal = (imageUrl) => {
+    setResumeImageUrl(imageUrl);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+  };
 
   return (
-    <section className="application">
-      <div className="container">
-        <h3>Application Form</h3>
-        <form onSubmit={handleApplication}>
-          <input
-            type="text"
-            placeholder="Your Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <input
-            type="email"
-            placeholder="Your Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Your Phone Number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Your Address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-          />
-          <textarea
-            placeholder="CoverLetter..."
-            value={coverLetter}
-            onChange={(e) => setCoverLetter(e.target.value)}
-          />
-          <div>
-            <label
-              style={{ textAlign: "start", display: "block", fontSize: "20px" }}
-            >
-              Select Resume
-            </label>
-            <input
-              type="file"
-              accept=".pdf, .jpg, .png"
-              onChange={handleFileChange}
-              style={{ width: "100%" }}
-            />
-          </div>
-          <button type="submit">Send Application</button>
-        </form>
-      </div>
+    <section className="my_applications page">
+      {user && user.role === "Job Seeker" ? (
+        <div className="container">
+          <h1>My Applications</h1>
+          {applications.length <= 0 ? (
+            <>
+              {" "}
+              <h4>No Applications Found</h4>{" "}
+            </>
+          ) : (
+            applications.map((element) => {
+              return (
+                <JobSeekerCard
+                  element={element}
+                  key={element._id}
+                  deleteApplication={deleteApplication}
+                  openModal={openModal}
+                />
+              );
+            })
+          )}
+        </div>
+      ) : (
+        <div className="container">
+          <h1>Applications From Job Seekers</h1>
+          {applications.length <= 0 ? (
+            <>
+              <h4>No Applications Found</h4>
+            </>
+          ) : (
+            applications.map((element) => {
+              return (
+                <EmployerCard
+                  element={element}
+                  key={element._id}
+                  openModal={openModal}
+                />
+              );
+            })
+          )}
+        </div>
+      )}
+      {modalOpen && (
+        <ResumeModal imageUrl={resumeImageUrl} onClose={closeModal} />
+      )}
     </section>
   );
 };
 
-export default Application;
+export default MyApplications;
+
+const JobSeekerCard = ({ element, deleteApplication, openModal }) => {
+  return (
+    <>
+      <div className="job_seeker_card">
+        <div className="detail">
+          <p>
+            <span>Name:</span> {element.name}
+          </p>
+          <p>
+            <span>Email:</span> {element.email}
+          </p>
+          <p>
+            <span>Phone:</span> {element.phone}
+          </p>
+          <p>
+            <span>Address:</span> {element.address}
+          </p>
+          <p>
+            <span>CoverLetter:</span> {element.coverLetter}
+          </p>
+        </div>
+        <div className="resume">
+          <img
+            src={element.resume.url}
+            alt="resume"
+            onClick={() => openModal(element.resume.url)}
+          />
+        </div>
+        <div className="btn_area">
+          <button onClick={() => deleteApplication(element._id)}>
+            Delete Application
+          </button>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const EmployerCard = ({ element, openModal }) => {
+  return (
+    <>
+      <div className="job_seeker_card">
+        <div className="detail">
+          <p>
+            <span>Name:</span> {element.name}
+          </p>
+          <p>
+            <span>Email:</span> {element.email}
+          </p>
+          <p>
+            <span>Phone:</span> {element.phone}
+          </p>
+          <p>
+            <span>Address:</span> {element.address}
+          </p>
+          <p>
+            <span>CoverLetter:</span> {element.coverLetter}
+          </p>
+        </div>
+        <div className="resume">
+          <img
+            src={element.resume.url}
+            alt="resume"
+            onClick={() => openModal(element.resume.url)}
+          />
+        </div>
+      </div>
+    </>
+  );
+};

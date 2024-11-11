@@ -185,8 +185,8 @@ const MyJobs=() =>{
                             <option value="MEAN Stack Development">
                               MEAN STACK Development
                             </option>
-                            <option value="MEVN Stack Development">
-                              MEVN STACK Development
+                            <option value="OTHER">
+                              OTHER
                             </option>
                             <option value="Data Entry Operator">
                               Data Entry Operator
